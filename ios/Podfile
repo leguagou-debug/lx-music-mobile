@@ -29,6 +29,9 @@ end
 target 'LxMusicMobile' do
   config = use_native_modules!
 
+  # Override SwiftAudioEx to a version compatible with Xcode 26 / Swift 6
+  pod 'SwiftAudioEx', '1.1.0'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # Enables Flipper.
@@ -52,5 +55,15 @@ target 'LxMusicMobile' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+
+    # Ensure all pods use a modern Swift version compatible with Xcode 26
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '5.9'
+        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] && config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 13.4
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.4'
+        end
+      end
+    end
   end
 end
