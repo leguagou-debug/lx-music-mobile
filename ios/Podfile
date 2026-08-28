@@ -26,11 +26,20 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Patch react-native-track-player podspec to use a modern Swift version
+# so that it can be compiled with Xcode 26 / Swift 6 without legacy compatibility libs.
+pre_install do |installer|
+  rntp_podspec = File.join(Dir.pwd, '..', 'node_modules', 'react-native-track-player', 'react-native-track-player.podspec')
+  if File.exist?(rntp_podspec)
+    text = File.read(rntp_podspec)
+    text = text.gsub(/s\.swift_version\s*=\s*"[^"]+"/, 's.swift_version = "5.9"')
+    File.write(rntp_podspec, text)
+    Pod::UI.puts "Patched react-native-track-player swift_version to 5.9"
+  end
+end
+
 target 'LxMusicMobile' do
   config = use_native_modules!
-
-  # Override SwiftAudioEx to a version compatible with Xcode 26 / Swift 6
-  pod 'SwiftAudioEx', '1.1.0'
 
   use_react_native!(
     :path => config[:reactNativePath],
