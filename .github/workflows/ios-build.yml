@@ -9,7 +9,9 @@ on:
 
 jobs:
   build-ios-simulator:
-    runs-on: macos-latest
+    # macos-15 ships with Xcode 16.4 by default and still includes Swift 5.x
+    # compatibility libraries required by react-native-track-player's SwiftAudioEx fork.
+    runs-on: macos-15
     env:
       NO_FLIPPER: 1
       CI: true
@@ -52,7 +54,7 @@ jobs:
             -workspace LxMusicMobile.xcworkspace \
             -scheme LxMusicMobile \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath DerivedData \
             clean build \
             CODE_SIGN_IDENTITY="" \
