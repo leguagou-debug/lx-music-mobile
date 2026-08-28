@@ -10,7 +10,7 @@
 | 文件 | 改动说明 |
 |---|---|
 | `ios/LxMusicMobile/Info.plist` | 添加后台音频模式（`audio`/`fetch`/`processing`）、麦克风与 Apple Music 权限说明 |
-| `ios/Podfile` | 固定最低 iOS 版本为 `13.0`；CI 环境下自动禁用 Flipper |
+| `ios/Podfile` | 固定最低 iOS 版本为 `13.4`；CI 环境下自动禁用 Flipper |
 | `react-native.config.js` | 新增配置文件，声明 iOS/Android 源码目录，支持 CI 禁用 Flipper |
 | `.github/workflows/ios-build.yml` | 新增 GitHub Actions 工作流，自动在 macOS 上编译 iOS 模拟器版本 |
 
@@ -87,10 +87,33 @@ base64 -i profile.mobileprovision | pbcopy
 
 ---
 
+## 已记录的失败与修复
+
+| 运行 | 失败原因 | 修复方式 |
+|---|---|---|
+| #1 | `React-FabricImage` 需要更高 iOS 版本 | Podfile 从 `13.0` 提升到 `13.4` |
+| #2 | GitHub Actions macOS 26 没有 `iPhone 15` 模拟器 | workflow 改用 `iPhone 17` |
+| #3 | `xcodebuild` 编译失败（12m 25s） | 已添加 `tee build-logs/xcodebuild.log`，下次运行可下载完整日志 |
+
+---
+
+## 当前状态
+
+本地已完成所有配置修改和文档，但**最新一次 push 因网络 SSL 握手失败未成功**。请稍后执行：
+
+```bash
+git push origin master
+```
+
+或直接进入 `C:\Users\32740\WorkBuddy\2026-08-28-16-24-26\lx-music-mobile` 目录操作。
+
+---
+
 ## 调试建议
 
 1. **先在 GitHub Actions 上跑通模拟器版本**，确认项目能编译。
-2. **再逐步修复运行时问题**：
+2. **查看 xcodebuild 日志 artifact**：`ios-build-log` 包含 `build-logs/xcodebuild.log`。
+3. **再逐步修复运行时问题**：
    - 如果启动白屏，检查 Metro 是否能正常打包 JS Bundle。
    - 如果音频无法播放，检查网络请求是否被 ATS 拦截（Info.plist 中 `NSAllowsArbitraryLoads` 当前为 `false`）。
    - 如果本地文件功能异常，考虑替换为 iOS 原生实现或条件禁用。
